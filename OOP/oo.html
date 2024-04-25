@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+
+    body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #9cd7e8; 
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px); 
+    gap: 2px; 
+    background-color: #999; 
+    padding: 2px; 
+}
+
+#board > button:hover {
+    background-color: #e1e1e1; 
+}
+#board button {
+    font-size: 2em; 
+    font-weight: bold; 
+    text-align: center; 
+    vertical-align: middle; 
+    line-height: 100px; 
+    width: 100px;
+    height: 100px;
+    
+}
+.x-color {
+    color: red;
+}
+#reset-button {
+    margin-top: 20px; 
+  }
+button:disabled {
+    background-color: #fff; 
+    color: #000; 
+}
+button:disabled.x-color {
+    color: red; 
+}
+
+ </style>
+
+</head>
+<body>
+    
+    <div id="board">
+        <button data-index="0"></button>
+        <button data-index="1"></button>
+        <button data-index="2"></button>
+        <button data-index="3"></button>
+        <button data-index="4"></button>
+        <button data-index="5"></button>
+        <button data-index="6"></button>
+        <button data-index="7"></button>
+        <button data-index="8"></button>
+        
+    </div>
+    <button id="reset-button">Reset Game</button>
+
+    <script>
+class Game {
+    constructor() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X'; // "X" starts the game
+        this.buttons = document.querySelectorAll("#board > button");
+        this.isGameOver = false;
+        this.winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+        this.initialize();
+    }
+
+    initialize() {
+        this.buttons.forEach(button => {
+            button.addEventListener("click", () => this.move(button.dataset.index));
+        });
+        document.getElementById("reset-button").addEventListener("click", () => this.resetGame());
+    }
+
+    move(index) {
+        if (this.isGameOver || this.board[index]) return;
+        this.board[index] = this.currentPlayer;
+        this.updateButton(index);
+        if (this.checkWin()) {
+            alert(`Player ${this.currentPlayer} wins!`);
+            this.isGameOver = true;
+            return;
+        }
+        if (this.checkDraw()) {
+            alert("It's a draw!");
+            this.isGameOver = true;
+            return;
+        }
+        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    updateButton(index) {
+        const button = this.buttons[index];
+        button.textContent = this.currentPlayer; // Use text symbols
+        button.classList.remove('x-color', 'o-color'); // Clear classes
+    if (this.currentPlayer === 'X') {
+        button.classList.add('x-color');
+    } else if (this.currentPlayer === 'O') {
+        button.classList.add('o-color');
+    }
+        button.disabled = true; // Disable the button
+    }
+
+    checkWin() {
+        return this.winningCombinations.some(combination => 
+            combination.every(index => this.board[index] === this.currentPlayer)
+        );
+    }
+
+    checkDraw() {
+        return this.board.every(cell => cell !== null);
+    }
+
+    resetGame() {
+        this.board = Array(9).fill(null);
+        this.currentPlayer = 'X';
+        this.isGameOver = false;
+        this.buttons.forEach(button => {
+            button.textContent = '';
+            button.disabled = false;
+        });
+    }
+}
+
+new Game();
+
+    </script> 
+</body>
+</html>

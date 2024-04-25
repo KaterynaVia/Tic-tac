@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+    body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #9cd7e8; 
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px); 
+    gap: 2px; 
+    background-color: #999; 
+    padding: 2px;
+}
+
+
+
+
+#board > button:hover {
+    background-color: #e1e1e1;
+}
+#board button {
+    font-size: 2em; 
+    font-weight: bold; 
+    text-align: center; 
+    vertical-align: middle; 
+    line-height: 100px; 
+    width: 100px; 
+    height: 100px; 
+    
+}
+.x-color {
+    color: red;
+}
+#reset-button {
+    margin-top: 20px; 
+  }
+    </style>
+    
+</head>
+<body>
+    
+    <div id="board">
+        <button data-index="0"></button>
+        <button data-index="1"></button>
+        <button data-index="2"></button>
+        <button data-index="3"></button>
+        <button data-index="4"></button>
+        <button data-index="5"></button>
+        <button data-index="6"></button>
+        <button data-index="7"></button>
+        <button data-index="8"></button>
+        
+    </div>
+  
+    <button id="reset-button">Reset Game</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+ //define the state:
+    const getInitialGameState = () => ({
+        board: Array(9).fill(""),
+        currentPlayer: "X",
+        winner: null,
+        draw: false
+    });
+//fuction to make Move
+    const makeMove = (state, position) => {
+        const newState = { ...state, board: [...state.board] };
+
+        if (newState.board[position] === "" && !newState.winner) {
+            newState.board[position] = state.currentPlayer;
+            
+            const winner = checkWinner(newState);
+            if (winner) {
+                newState.winner = winner;
+            } else if (isDraw(newState)) {
+                newState.draw = true;
+            } else {
+                newState.currentPlayer = newState.currentPlayer === "X" ? "O" : "X";
+            }
+        }
+
+        return newState;
+    };
+
+    //Check a winner
+    const checkWinner = (state) => {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        for (let combination of winningCombinations) {
+            const [a, b, c] = combination;
+            if (state.board[a] && state.board[a] === state.board[b] && state.board[a] === state.board[c]) {
+                return state.board[a];
+            }
+        }
+
+        return null;
+    };
+
+ //dlya nichii 1:1 state
+    const isDraw = (state) => {
+        return state.board.every(cell => cell !== "") && !state.winner;
+    };
+
+    // Function для відновлення стану гри 
+    const render = (state) => {
+        state.board.forEach((cell, index) => {
+            const button = document.querySelector(`button[data-index="${index}"]`);
+            button.textContent = cell;
+            button.classList.remove('x-color', 'o-color'); 
+            if (cell === "X") {
+                button.classList.add('x-color'); 
+            } else if (cell === "O") {
+                button.classList.add('o-color'); 
+            }
+        });
+
+        const status = document.getElementById('status');
+        if (state.winner) {
+
+        setTimeout(() => alert(`Congratulation! Winner is: ${state.winner}`), 100);
+    } else if (state.draw) {
+        setTimeout(() => alert("It's a draw!"), 100);
+    }
+       
+    };
+
+    // Set up для кожної події listener
+    document.querySelectorAll('button[data-index]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const index = parseInt(button.getAttribute('data-index'), 10);
+            gameState = makeMove(gameState, index);
+            render(gameState);
+        });
+    });
+
+    // Reset game event listener
+    document.getElementById('reset-button').addEventListener('click', () => {
+        gameState = getInitialGameState();
+        render(gameState);
+    });
+
+    // Initialize the game
+    let gameState = getInitialGameState();
+    render(gameState);
+});
+
+    </script> 
+</body>
+</html>
